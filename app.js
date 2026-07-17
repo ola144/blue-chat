@@ -8,6 +8,14 @@ const userRoute = require("./Routes/userRoute");
 const chatRoute = require("./Routes/chatRoute");
 const msgRoute = require("./Routes/messageRoute");
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://localhost:4200",
+  "https://blue-chat-ui.vercel.app",
+  "https://blue-chat-wryt.onrender.com",
+];
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -15,16 +23,21 @@ app.use(
       if (!origin) return callback(null, true);
 
       // Allow any localhost port
-      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
         return callback(null, true);
       }
 
       callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PATCH"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   }),
 );
+
+app.use(cors(/* options */));
 
 app.use(
   express.json({
@@ -41,13 +54,16 @@ const io = require("socket.io")(server, {
       if (!origin) return callback(null, true);
 
       // Allow any localhost port
-      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+      ) {
         return callback(null, true);
       }
 
       callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PATCH"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   },
 });
