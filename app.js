@@ -19,25 +19,17 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no Origin (Postman, mobile apps, curl)
       if (!origin) return callback(null, true);
 
-      // Allow any localhost port
-      if (
-        allowedOrigins.includes(origin) ||
-        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
-      ) {
-        return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, origin);
       }
 
       callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   }),
 );
-
-// app.use(cors(/* options */));
 
 app.use(
   express.json({
@@ -50,20 +42,14 @@ const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: (origin, callback) => {
-      // Allow requests with no Origin (Postman, mobile apps, curl)
       if (!origin) return callback(null, true);
 
-      // Allow any localhost port
-      if (
-        allowedOrigins.includes(origin) ||
-        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
-      ) {
-        return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, origin);
       }
 
       callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   },
 });
